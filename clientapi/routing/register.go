@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/matrix-org/dendrite/clientapi/threepid"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -148,6 +149,8 @@ type authDict struct {
 	Session string                      `json:"session"`
 	Mac     gomatrixserverlib.HexString `json:"mac"`
 
+	//Email
+	ThreePidCredentials threepid.Credentials `json:"threepid_creds"`
 	// Recaptcha
 	Response string `json:"response"`
 	// TODO: Lots of custom keys depending on the type
@@ -644,6 +647,9 @@ func handleRegistrationFlow(
 		// there is nothing to do
 		// Add Dummy to the list of completed registration stages
 		AddCompletedSessionStage(sessionID, authtypes.LoginTypeDummy)
+
+	case authtypes.LoginTypeEmail:
+		AddCompletedSessionStage(sessionID, authtypes.LoginTypeEmail)
 
 	case "":
 		// An empty auth type means that we want to fetch the available
